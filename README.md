@@ -1,2 +1,2 @@
 # my-samples
-Samples for me
+Sample notes and projects
