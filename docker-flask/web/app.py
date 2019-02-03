@@ -1,170 +1,181 @@
 from flask import Flask, jsonify, request
 from flask_restful import Api, Resource
+import os
+
+from pymongo import MongoClient
 
 app = Flask(__name__)
 api = Api(app)
 
+client = MongoClient("mongodb://db:27017")
+db = client.aNewDB
+UserNum = db["UserNum"]
 
-def verifyPost(postData, funcName):
+UserNum.insert({
+    'num_of_users':0
+})
 
-    if (funcName == 'add'):
-        if ('x' not in postData) or ('y' not in postData):
-            return 301
+class Visit(Resource):
+    def get(self):
+        prev_num = UserNum.find({})[0]['num_of_users']
+        new_num = prev_num + 1
+        UserNum.update({}, {"$set":{"num_of_users":new_num}})
+        return str("Hello user " + str(new_num))
+
+
+def checkPostedData(postedData, functionName):
+    if (functionName == "add" or functionName == "subtract" or functionName == "multiply"):
+        if "x" not in postedData or "y" not in postedData:
+            return 301 #Missing parameter
         else:
             return 200
-    elif (funcName == 'subtract'):
-        if ('x' not in postData) or ('y' not in postData):
+    elif (functionName == "division"):
+        if "x" not in postedData or "y" not in postedData:
             return 301
-        else:
-            return 200
-    elif (funcName == 'multiply'):
-        if ('x' not in postData) or ('y' not in postData):
-            return 301
-        else:
-            return 200
-    elif (funcName == 'divide'):
-        if ('x' not in postData) or ('y' not in postData):
-            return 301
-        elif (postData['y'] == 0):
+        elif int(postedData["y"])==0:
             return 302
         else:
             return 200
 
-
-
 class Add(Resource):
     def post(self):
-        postData = request.get_json()
+        #If I am here, then the resouce Add was requested using the method POST
 
-        status = verifyPost(postData, 'add')
-        if status != 200:
-            resultMap = {
-                'Message': 'Missing Value',
-                'Status': status
+        #Step 1: Get posted data:
+        postedData = request.get_json()
+
+        #Steb 1b: Verify validity of posted data
+        status_code = checkPostedData(postedData, "add")
+        if (status_code!=200):
+            retJson = {
+                "Message": "An error happened",
+                "Status Code":status_code
             }
-        else:
-            x = postData['x']
-            y = postData['y']
-            result = int(x) + int(y)
+            return jsonify(retJson)
 
-            resultMap = {
-                'Message': result,
-                'Status': 200
-            }
+        #If i am here, then status_code == 200
+        x = postedData["x"]
+        y = postedData["y"]
+        x = int(x)
+        y = int(y)
 
-        return jsonify(resultMap)
-
-
+        #Step 2: Add the posted data
+        ret = x+y
+        retMap = {
+            'Message': ret,
+            'Status Code': 200
+        }
+        return jsonify(retMap)
 
 class Subtract(Resource):
     def post(self):
-        postData = request.get_json()
+        #If I am here, then the resouce Subtract was requested using the method POST
 
-        status = verifyPost(postData, 'subtract')
-        if status != 200:
-            resultMap = {
-                'Message': 'Missing Value',
-                'Status': status
+        #Step 1: Get posted data:
+        postedData = request.get_json()
+
+        #Steb 1b: Verify validity of posted data
+        status_code = checkPostedData(postedData, "subtract")
+
+
+        if (status_code!=200):
+            retJson = {
+                "Message": "An error happened",
+                "Status Code":status_code
             }
-        else:
-            x = postData['x']
-            y = postData['y']
-            result = int(x) - int(y)
+            return jsonify(retJson)
 
-            resultMap = {
-                'Message': result,
-                'Status': 200
-            }
+        #If i am here, then status_code == 200
+        x = postedData["x"]
+        y = postedData["y"]
+        x = int(x)
+        y = int(y)
 
-        return jsonify(resultMap)
+        #Step 2: Subtract the posted data
+        ret = x-y
+        retMap = {
+            'Message': ret,
+            'Status Code': 200
+        }
+        return jsonify(retMap)
+
 
 class Multiply(Resource):
     def post(self):
-        postData = request.get_json()
+        #If I am here, then the resouce Multiply was requested using the method POST
 
-        status = verifyPost(postData, 'multiply')
-        if status != 200:
-            resultMap = {
-                'Message': 'Missing Value',
-                'Status': status
+        #Step 1: Get posted data:
+        postedData = request.get_json()
+
+        #Steb 1b: Verify validity of posted data
+        status_code = checkPostedData(postedData, "multiply")
+
+
+        if (status_code!=200):
+            retJson = {
+                "Message": "An error happened",
+                "Status Code":status_code
             }
-        else:
-            x = postData['x']
-            y = postData['y']
-            result = int(x) * int(y)
+            return jsonify(retJson)
 
-            resultMap = {
-                'Message': result,
-                'Status': 200
-            }
+        #If i am here, then status_code == 200
+        x = postedData["x"]
+        y = postedData["y"]
+        x = int(x)
+        y = int(y)
 
-        return jsonify(resultMap)
+        #Step 2: Multiply the posted data
+        ret = x*y
+        retMap = {
+            'Message': ret,
+            'Status Code': 200
+        }
+        return jsonify(retMap)
 
 class Divide(Resource):
     def post(self):
-        postData = request.get_json()
+        #If I am here, then the resouce Divide was requested using the method POST
 
-        status = verifyPost(postData, 'divide')
-        if status != 200:
-            resultMap = {
-                'Message': 'Missing or error Value',
-                'Status': status
+        #Step 1: Get posted data:
+        postedData = request.get_json()
+
+        #Steb 1b: Verify validity of posted data
+        status_code = checkPostedData(postedData, "division")
+
+
+        if (status_code!=200):
+            retJson = {
+                "Message": "An error happened",
+                "Status Code":status_code
             }
-        else:
-            x = postData['x']
-            y = postData['y']
-            result = int(x) / int(y)
+            return jsonify(retJson)
 
-            resultMap = {
-                'Message': result,
-                'Status': 200
-            }
+        #If i am here, then status_code == 200
+        x = postedData["x"]
+        y = postedData["y"]
+        x = int(x)
+        y = int(y)
 
-        return jsonify(resultMap)
+        #Step 2: Multiply the posted data
+        ret = (x*1.0)/y
+        retMap = {
+            'Message': ret,
+            'Status Code': 200
+        }
+        return jsonify(retMap)
 
 
-api.add_resource(Add, '/add')
-api.add_resource(Subtract, '/subtract')
-api.add_resource(Multiply, '/multiply')
-api.add_resource(Divide, '/divide')
+
+api.add_resource(Add, "/add")
+api.add_resource(Subtract, "/subtract")
+api.add_resource(Multiply, "/multiply")
+api.add_resource(Divide, "/division")
+api.add_resource(Visit, "/hello")
 
 @app.route('/')
 def hello_world():
-    return 'Hello World!'
-
-@app.route('/hithere')
-def hi_there():
-    return 'Welcome to Hi There!'
-
-@app.route('/addnum', methods=['POST'])
-def add_two_nums():
-    dataDict = request.get_json()
-
-    x = dataDict['x']
-    y = dataDict['y']
-    z = x + y
-
-    retJson = {
-        'z': z
-    }
-
-    return jsonify(retJson), 200
+    return "Hello World!"
 
 
-@app.route('/bye')
-def bye_now():
-    c = 14*152000
-    s= str(c)
-
-    retJson  =  {
-        "field1": "Theres the answer",
-        "field2": "testing"
-    }
-
-    return jsonify(retJson)
-
-
-
-
-if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000)
+if __name__=="__main__":
+    app.run(host='0.0.0.0')
