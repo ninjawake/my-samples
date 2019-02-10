@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile</title>
+</head>
+<body>
+    <h1>{{ profile.name_detail }}</h1>
+        <ul>
+          <li><strong>Products:</strong> {{ profile.products }}</li>
+          <li><strong>Active Rate:</strong> {{ profile.active }}</li>
+          <li><strong>Average Purchase:</strong> {{ profile.avg_purchase }}</li>
+            <li><strong>Average Shop Time:</strong> {{ profile.avg_shop_time }}</li>
+            <li><strong>Overall Status:</strong> {{ profile.status }}</li>
+        </ul>
+        <div><img src="" alt="" width="300px"></div>
+
+        <p><a href="{{ url_for('profiles') }}">Back to Authors</a></p>
+</body>
+</html>
