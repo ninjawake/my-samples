@@ -1,6 +1,9 @@
+import sqlite3
 from flask import Flask, jsonify, request, abort, redirect, url_for
 from flask import render_template
 from flask_restful import Api, Resource
+import config
+
 
 app = Flask(__name__)
 
@@ -23,10 +26,16 @@ PROFILE_INFO = {
     }
 }
 
+
+def connect_db():
+    return sqlite3.connect(config.DATABASE_NAME)
+
 @app.route('/')
 def index():
-    item_list = ['Beam','Kafka','ElasticSearch']
-    rendered_html = render_template('index.html', items=item_list)
+    db_connection = connect_db()
+    cursor = db_connection.execute('SELECT id, name FROM profile;')
+    items = [dict(id=row[0], name=row[1]) for row in cursor.fetchall()]
+    rendered_html = render_template('index.html', items=items)
     return rendered_html
 
 @app.route('/profiles')
