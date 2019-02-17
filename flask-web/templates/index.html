@@ -8,7 +8,7 @@
 <h1>Flask Web Version 1</h1>
     <ul>
     {% for i in items %}
-        <li>{{ i }}</li>
+        <li>{{ i['id'] }} : {{ i['name'] }}</li>
     {% endfor %}
     </ul>
 </body>
